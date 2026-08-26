@@ -12,9 +12,11 @@ import { SobaGrain } from "./Motifs";
 
 const NAV: { href: string; label: L10n }[] = [
   { href: "/menu", label: { ja: "お品書き", en: "Menu" } },
+  { href: "/soba", label: { ja: "そば粉", en: "The flour" } },
   { href: "/story", label: { ja: "家のこと", en: "The house" } },
   { href: "/calendar", label: { ja: "営業日", en: "Opening days" } },
   { href: "/access", label: { ja: "道のり", en: "Getting here" } },
+  { href: "/news", label: { ja: "お知らせ", en: "News" } },
 ];
 
 export function Header({ locale }: { locale: Locale }) {
@@ -36,21 +38,35 @@ export function Header({ locale }: { locale: Locale }) {
           </span>
         </Link>
 
-        <div className="flex items-center gap-1">
-          <nav aria-label={locale === "ja" ? "サイト内" : "Site"}>
-            <ul className="flex items-center">
-              {NAV.map((n) => (
-                <li key={n.href}>
-                  <Link
-                    href={localePath(n.href, locale)}
-                    className="block rounded px-2.5 py-2 text-[0.82rem] text-usuzumi transition-colors hover:text-andon sm:px-3 sm:text-sm"
-                  >
-                    {t(n.label, locale)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+        <div className="flex min-w-0 items-center gap-1">
+          {/*
+            項目が 6 つあるので、狭い画面では横に流す(折り返すと看板を押し下げる)。
+            右端をぼかして「まだ先がある」ことを見せる。開閉式にしないのは、
+            開いたままページが変わる状態を持ちたくないため。
+          */}
+          <div className="relative min-w-0">
+            <nav
+              aria-label={locale === "ja" ? "サイト内" : "Site"}
+              className="min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              <ul className="flex items-center whitespace-nowrap">
+                {NAV.map((n) => (
+                  <li key={n.href}>
+                    <Link
+                      href={localePath(n.href, locale)}
+                      className="block rounded px-2.5 py-2 text-[0.82rem] text-usuzumi transition-colors hover:text-andon sm:px-3 sm:text-sm"
+                    >
+                      {t(n.label, locale)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-sumi to-transparent lg:hidden"
+            />
+          </div>
 
           {/*
             言語の切り替え。root layout が言語ごとに分かれているので

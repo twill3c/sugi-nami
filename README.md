@@ -28,9 +28,12 @@
 |---|---|---|
 | `/` | `/en` | 表・今月の菓子・店のこと・道のりの要約 |
 | `/menu` | `/en/menu` | お品書き(通年 7 品 + 季節 8 品)、アレルゲンの絞り込み |
+| `/soba` | `/en/soba` | 実の断面、四つの粉、どの粉でどの菓子を作るか |
 | `/story` | `/en/story` | 家の年表・改修前後の間取り・残したもの |
 | `/calendar` | `/en/calendar` | 三か月ぶんの営業日、休みの決まり |
 | `/access` | `/en/access` | 道のりの略図、行き方、営業、建物のこと |
+| `/news` | `/en/news` | お知らせ 5 本。本文は MDX |
+| `/news/<slug>` | `/en/news/<slug>` | 記事。前後の記事へのたどりと NewsArticle 構造化データ |
 
 ## 二言語のつくり
 
@@ -44,6 +47,25 @@
 [`app/(en)/layout.tsx`](src/app/\(en\)/layout.tsx))。
 静的書き出しでは layout が経路を読めないので、ルートグループで分ける以外に
 正しい lang を出す手立てがない。言語の切り替えはページ遷移になる。
+
+## 粉とお品書きを結ぶ
+
+`/soba` は四つの粉それぞれに「この粉で作るもの」を持ち、`menu.ts` の id で指しています。
+[`soba.test.ts`](src/data/soba.test.ts) が **お品書きの全品がどれかの粉か
+「粉を使わない品」に必ず割り当たること**を確かめるので、菓子を足したのに粉の話が
+古いまま、が起きません。
+
+## お知らせ(MDX)
+
+見出しと日付は [`src/data/news.ts`](src/data/news.ts) が持ち、本文は
+`content/news/<日付>-<slug>.<言語>.mdx` が持ちます。MDX をページにはせず、
+素材として動的 import で読むだけ —— ページにすると、日本語版と英語版の経路を
+MDX の置き場所に合わせる羽目になるからです。書式は
+[`src/mdx-components.tsx`](src/mdx-components.tsx) で一度だけ決めます。
+
+[`news.test.ts`](src/data/news.test.ts) が、記事ごと・言語ごとに mdx があること、
+**一覧に載っていない原稿が content/ に残っていないこと**、日本語の記事から
+`/en/...` へ飛ばしていないことを確かめます。
 
 ## そばアレルギーの扱い
 
@@ -64,7 +86,7 @@
 ```bash
 pnpm install
 pnpm dev        # http://localhost:3000
-pnpm test       # データ・構造化データ・営業日の検査(59 件)
+pnpm test       # データ・構造化データ・営業日・粉とお知らせの検査(88 件)
 pnpm typecheck
 pnpm build      # out/ に静的書き出し
 ```
@@ -78,7 +100,7 @@ ASCII 全部)に落として、欧文だけの OG 画像を焼く。ネットワ
 ## 技術
 
 Next.js 15 (App Router・静的書き出し) / React 19 / TypeScript / Tailwind CSS v4 /
-Vitest。サーバ関数を持たないので Vercel 上で Function 実行は発生しない。
+MDX (@next/mdx) / Vitest。サーバ関数を持たないので Vercel 上で Function 実行は発生しない。
 
 ## 既知の限界
 

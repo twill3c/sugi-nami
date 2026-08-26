@@ -7,17 +7,21 @@ const COPY = {
   hours: { ja: "営業", en: "Hours" },
   guide: { ja: "案内", en: "Pages" },
   menu: { ja: "お品書き", en: "Menu" },
+  soba: { ja: "そば粉", en: "The flour" },
   story: { ja: "家のこと", en: "The house" },
   calendar: { ja: "営業日", en: "Opening days" },
   access: { ja: "道のり", en: "Getting here" },
+  news: { ja: "お知らせ", en: "News" },
 } satisfies Record<string, L10n>;
 
 export function Footer({ locale }: { locale: Locale }) {
   const links = [
     { href: "/menu", label: COPY.menu },
+    { href: "/soba", label: COPY.soba },
     { href: "/story", label: COPY.story },
     { href: "/calendar", label: COPY.calendar },
     { href: "/access", label: COPY.access },
+    { href: "/news", label: COPY.news },
   ];
 
   return (

@@ -46,7 +46,7 @@ export function MenuView({ locale }: { locale: Locale }) {
           <p className="text-xs tracking-[0.3em] text-sobacha">
             {t(COPY.eyebrow, locale)}
           </p>
-          <h1 className="mt-4 font-mincho text-4xl tracking-[0.1em] text-kinari">
+          <h1 className="mt-4 font-mincho text-3xl sm:text-4xl tracking-[0.1em] text-kinari">
             {t(COPY.title, locale)}
           </h1>
           <p className="mt-6 text-sm leading-relaxed text-usuzumi">
