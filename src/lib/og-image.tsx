@@ -1,17 +1,14 @@
 import { ImageResponse } from "next/og";
-import { SHOP } from "@/data/shop";
-import { loadJapaneseFont } from "@/lib/og-font";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { SHOP } from "@/data/shop";
+import { loadJapaneseFont } from "./og-font";
+import type { Locale } from "@/i18n/locale";
 
-export const alt = `${SHOP.name} — ${SHOP.tagline}`;
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+export const OG_SIZE = { width: 1200, height: 630 };
 
-// 静的書き出しではビルド時に一度だけ焼く
-export const dynamic = "force-static";
-
-// 杉並木。手前から奥へ細くしながら左右に立てる(トップの図と同じ式)
+// 杉並木。手前から奥へ細くしながら左右に立てる(サイトの図と同じ式)。
+// 一番手前は枠の外に出す。そうしないと左右に黒が残る
 const TRUNKS = Array.from({ length: 9 }, (_, i) => {
   const depth = i / 8;
   const scale = 1 - depth * 0.84;
@@ -22,19 +19,36 @@ const TRUNKS = Array.from({ length: 9 }, (_, i) => {
   };
 });
 
-export default async function Image() {
-  const text = `${SHOP.name}${SHOP.tagline}長野県戸隠`;
-  const font = await loadJapaneseFont("Shippori Mincho B1", 500, text);
+/**
+ * OG 画像をビルド時に焼く。日本語版と英語版で文言だけが変わる。
+ *
+ * Satori は放射グラデーションの再現が弱いので、参道の光は線形で置く。
+ * 幹は背景より明るい色で描く(暗い幹を暗い背景に置くと並木に見えない)。
+ */
+export async function ogImage(locale: Locale) {
+  const text = `${SHOP.name[locale]}${SHOP.tagline[locale]}${SHOP.address.region[locale]}${SHOP.address.locality[locale]}`;
+  const fetched = locale === "ja" ? await loadJapaneseFont(
+    "Shippori Mincho B1",
+    500,
+    text,
+  ) : null;
 
-  // Satori はフォントが一枚も無いと落ちるので、取得に失敗したときのために
-  // 欧文だけの部分集合をリポジトリに置いてある(7.7KB)。
-  // ビルド時にネットワークが無くても OG 画像は出る。欧文の版になるだけ。
+  // Satori はフォントが一枚も無いと落ちる。欧文の部分集合(ASCII 全部)を
+  // リポジトリに置いてあるので、ネットワークが無くても画像は焼ける。
   const fallback = await readFile(
     path.join(process.cwd(), "src/assets/shippori-latin.woff"),
   );
+  const font = fetched ?? (fallback.buffer as ArrayBuffer);
 
-  const heading = font ? SHOP.name : SHOP.nameEn;
-  const sub = font ? SHOP.tagline : "Togakushi, Nagano";
+  // 日本語のフォントが取れなかったときだけ、欧文の文言に落とす
+  const jaOk = locale === "ja" && fetched !== null;
+  const region = jaOk
+    ? `${SHOP.address.region.ja}${SHOP.address.locality.ja}`
+    : locale === "en"
+      ? "TOGAKUSHI, NAGANO"
+      : "TOGAKUSHI";
+  const heading = jaOk ? SHOP.name.ja : SHOP.shortName.en;
+  const sub = jaOk ? SHOP.tagline.ja : SHOP.tagline.en;
 
   return new ImageResponse(
     (
@@ -50,7 +64,7 @@ export default async function Image() {
           padding: "72px 88px",
         }}
       >
-        {/* 参道の奥から差す光。Satori は放射グラデーションの再現が弱いので線形で置く */}
+        {/* 参道の奥から差す光 */}
         <div
           style={{
             position: "absolute",
@@ -108,7 +122,11 @@ export default async function Image() {
         />
 
         <div
-          style={{ position: "relative", display: "flex", flexDirection: "column" }}
+          style={{
+            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
           <div
             style={{
@@ -118,12 +136,12 @@ export default async function Image() {
               display: "flex",
             }}
           >
-            {font ? "長野県戸隠" : "TOGAKUSHI"}
+            {region}
           </div>
           <div
             style={{
               marginTop: 24,
-              fontSize: 96,
+              fontSize: jaOk ? 96 : 88,
               letterSpacing: 8,
               color: "#efe5d6",
               display: "flex",
@@ -146,11 +164,11 @@ export default async function Image() {
       </div>
     ),
     {
-      ...size,
+      ...OG_SIZE,
       fonts: [
         {
           name: "Shippori Mincho B1",
-          data: font ?? (fallback.buffer as ArrayBuffer),
+          data: font,
           weight: 500 as const,
           style: "normal" as const,
         },

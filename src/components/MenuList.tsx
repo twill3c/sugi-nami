@@ -3,13 +3,44 @@
 import { useMemo, useState } from "react";
 import {
   ALLERGENS,
+  ALLERGEN_LABEL,
   MENU,
+  SEASON_LABEL,
   SEASON_ORDER,
+  formatAllergens,
   formatPrice,
   menuWithout,
   type Allergen,
 } from "@/data/menu";
+import { t, type L10n, type Locale } from "@/i18n/locale";
 import { Yukiwa } from "./Motifs";
+
+const COPY = {
+  exclude: { ja: "苦手なものを外す", en: "Leave something out" },
+  ingredients: { ja: "原材料", en: "Contains" },
+  takeout: { ja: "持ち帰り可", en: "To take away" },
+  none: {
+    ja: "選んだ条件に合う菓子がありません。",
+    en: "Nothing on the list matches what you left out.",
+  },
+} satisfies Record<string, L10n>;
+
+function status(
+  excluded: Allergen[],
+  shown: number,
+  locale: Locale,
+): string {
+  if (excluded.length === 0) {
+    return locale === "ja"
+      ? `${MENU.length} 品すべてを表示しています。`
+      : `Showing all ${MENU.length} items.`;
+  }
+  const names = excluded.map((a) => ALLERGEN_LABEL[a][locale]);
+  const hidden = MENU.length - shown;
+  return locale === "ja"
+    ? `${names.join("・")}を除いて ${shown} 品。${hidden} 品を隠しています。`
+    : `Without ${names.join(", ")}: ${shown} items. ${hidden} hidden.`;
+}
 
 /**
  * お品書き。絞り込みは「除く」方向にだけ効かせる。
@@ -17,11 +48,10 @@ import { Yukiwa } from "./Motifs";
  * 何も選んでいない状態が全品表示なので、JS が動かなくても
  * サーバが描いた全品の HTML がそのまま正しいお品書きになる。
  */
-export function MenuList() {
+export function MenuList({ locale }: { locale: Locale }) {
   const [excluded, setExcluded] = useState<Allergen[]>([]);
 
   const shown = useMemo(() => menuWithout(excluded), [excluded]);
-  const hiddenCount = MENU.length - shown.length;
 
   function toggle(a: Allergen) {
     setExcluded((prev) =>
@@ -33,7 +63,7 @@ export function MenuList() {
     <>
       <fieldset className="no-print washi rounded-sm p-5">
         <legend className="px-2 text-xs tracking-[0.2em] text-sobacha">
-          苦手なものを外す
+          {t(COPY.exclude, locale)}
         </legend>
         <div className="mt-2 flex flex-wrap gap-2">
           {ALLERGENS.map((a) => {
@@ -54,7 +84,7 @@ export function MenuList() {
                   onChange={() => toggle(a)}
                 />
                 {on ? "− " : ""}
-                {a}
+                {t(ALLERGEN_LABEL[a], locale)}
               </label>
             );
           })}
@@ -62,9 +92,7 @@ export function MenuList() {
 
         {/* 絞り込みの結果は視覚だけでなく読み上げにも届ける */}
         <p aria-live="polite" className="mt-4 text-xs text-usuzumi">
-          {excluded.length === 0
-            ? `${MENU.length} 品すべてを表示しています。`
-            : `${excluded.join("・")}を除いて ${shown.length} 品。${hiddenCount} 品を隠しています。`}
+          {status(excluded, shown.length, locale)}
         </p>
       </fieldset>
 
@@ -78,12 +106,12 @@ export function MenuList() {
             className="mt-16 first:mt-10"
           >
             <div className="flex items-center gap-3">
-              {season === "冬" && <Yukiwa className="h-5 w-5 text-yuki" />}
+              {season === "winter" && <Yukiwa className="h-5 w-5 text-yuki" />}
               <h2
                 id={`season-${season}`}
                 className="font-mincho text-xl tracking-[0.2em] text-sobacha"
               >
-                {season}
+                {t(SEASON_LABEL[season], locale)}
               </h2>
               <span className="h-px flex-1 bg-hari" />
             </div>
@@ -93,26 +121,27 @@ export function MenuList() {
                 <div key={item.id} className="grid gap-2 py-6 sm:grid-cols-3">
                   <dt className="sm:col-span-1">
                     <span className="font-mincho text-lg text-kinari">
-                      {item.name}
+                      {t(item.name, locale)}
                     </span>
                     <span className="mt-1 block text-xs tracking-widest text-usuzumi">
-                      {item.reading}
+                      {t(item.reading, locale)}
                     </span>
                     <span className="mt-2 block text-sm text-andon">
-                      {formatPrice(item.price)}
+                      {formatPrice(item.price, locale)}
                     </span>
                   </dt>
                   <dd className="sm:col-span-2">
                     <p className="text-sm leading-relaxed text-kinari/85">
-                      {item.description}
+                      {t(item.description, locale)}
                     </p>
                     <p className="mt-3 text-xs text-usuzumi">
-                      <span className="text-sobacha">原材料</span> そば粉
-                      {item.allergens.length > 0 &&
-                        ` ・ ${item.allergens.join(" ・ ")}`}
+                      <span className="text-sobacha">
+                        {t(COPY.ingredients, locale)}
+                      </span>{" "}
+                      {formatAllergens(item, locale)}
                       {item.takeout && (
                         <span className="ml-3 rounded-sm border border-hari px-2 py-0.5">
-                          持ち帰り可
+                          {t(COPY.takeout, locale)}
                         </span>
                       )}
                     </p>
@@ -126,7 +155,7 @@ export function MenuList() {
 
       {shown.length === 0 && (
         <p className="mt-16 text-center text-sm text-usuzumi">
-          選んだ条件に合う菓子がありません。
+          {t(COPY.none, locale)}
         </p>
       )}
     </>

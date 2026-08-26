@@ -1,25 +1,56 @@
+import { t, type L10n, type Locale } from "@/i18n/locale";
+
 /**
  * 道のりの略図。
  *
  * 架空の店なので実地図にピンは立てない。代わりに、
  * 「長野駅 → バス → 中社 → 杉並木 → 店」という順序だけを図にする。
- * 図が読めない環境のために、同じ内容を <figcaption> の文章でも持つ。
+ * 図が読めない環境のために、同じ内容を aria-label と figcaption の文章でも持つ。
  */
 
-const STOPS = [
-  { x: 26, label: "JR 長野駅", sub: "善光寺口 7 番" },
-  { x: 90, label: "戸隠中社", sub: "バス 約 60 分" },
-  { x: 154, label: "杉なみ", sub: "杉並木を 徒歩 7 分" },
+const STOPS: { x: number; label: L10n; sub: L10n }[] = [
+  {
+    x: 26,
+    label: { ja: "JR 長野駅", en: "JR Nagano" },
+    sub: { ja: "善光寺口 7 番", en: "Zenkōji exit, stop 7" },
+  },
+  {
+    x: 90,
+    label: { ja: "戸隠中社", en: "Togakushi Chūsha" },
+    sub: { ja: "バス 約 60 分", en: "bus, about 60 min" },
+  },
+  {
+    x: 154,
+    label: { ja: "杉なみ", en: "Suginami" },
+    sub: { ja: "杉並木を 徒歩 7 分", en: "7 min on foot" },
+  },
 ];
 
-export function RouteMap({ className }: { className?: string }) {
+const COPY = {
+  alt: {
+    ja: "長野駅からバスで戸隠中社、そこから杉並木ぞいに徒歩 7 分で店に着く道のりの略図",
+    en: "A schematic of the route: bus from Nagano Station to Togakushi Chūsha, then seven minutes on foot along the cedar avenue.",
+  },
+  caption: {
+    ja: "実線がバス、破線が徒歩の区間です。緑の線は杉並木。架空の店舗のため、地図上の正確な位置は示していません。",
+    en: "The solid line is the bus, the dashed line is on foot, and the green marks are the cedar avenue. As the shop is fictional, no exact location is shown.",
+  },
+} satisfies Record<string, L10n>;
+
+export function RouteMap({
+  className,
+  locale,
+}: {
+  className?: string;
+  locale: Locale;
+}) {
   return (
     <figure className={className}>
       <svg
         viewBox="0 0 180 96"
         className="w-full"
         role="img"
-        aria-label="長野駅からバスで戸隠中社、そこから杉並木ぞいに徒歩 7 分で店に着く道のりの略図"
+        aria-label={t(COPY.alt, locale)}
       >
         {/* 道 — 山道なので直線にしない */}
         <path
@@ -52,7 +83,7 @@ export function RouteMap({ className }: { className?: string }) {
         ))}
 
         {STOPS.map((s, i) => (
-          <g key={s.label}>
+          <g key={s.label.ja}>
             <circle
               cx={s.x}
               cy={i === 1 ? 38 : 62}
@@ -68,7 +99,7 @@ export function RouteMap({ className }: { className?: string }) {
               fill="var(--color-kinari)"
               fontSize="7"
             >
-              {s.label}
+              {t(s.label, locale)}
             </text>
             <text
               x={s.x}
@@ -77,15 +108,14 @@ export function RouteMap({ className }: { className?: string }) {
               fill="var(--color-usuzumi)"
               fontSize="5"
             >
-              {s.sub}
+              {t(s.sub, locale)}
             </text>
           </g>
         ))}
       </svg>
 
       <figcaption className="mt-4 text-xs leading-relaxed text-usuzumi">
-        実線がバス、破線が徒歩の区間です。緑の線は杉並木。
-        架空の店舗のため、地図上の正確な位置は示していません。
+        {t(COPY.caption, locale)}
       </figcaption>
     </figure>
   );

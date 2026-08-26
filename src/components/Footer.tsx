@@ -1,51 +1,75 @@
 import Link from "next/link";
 import { SHOP, formatPeriod } from "@/data/shop";
+import { localePath, t, type L10n, type Locale } from "@/i18n/locale";
 import { GrainRule } from "./Motifs";
 
-export function Footer() {
+const COPY = {
+  hours: { ja: "営業", en: "Hours" },
+  guide: { ja: "案内", en: "Pages" },
+  menu: { ja: "お品書き", en: "Menu" },
+  story: { ja: "家のこと", en: "The house" },
+  calendar: { ja: "営業日", en: "Opening days" },
+  access: { ja: "道のり", en: "Getting here" },
+} satisfies Record<string, L10n>;
+
+export function Footer({ locale }: { locale: Locale }) {
+  const links = [
+    { href: "/menu", label: COPY.menu },
+    { href: "/story", label: COPY.story },
+    { href: "/calendar", label: COPY.calendar },
+    { href: "/access", label: COPY.access },
+  ];
+
   return (
     <footer className="mt-24 border-t border-hari bg-tsuchi/40">
       <div className="mx-auto max-w-5xl px-5 py-12">
         <div className="grid gap-10 sm:grid-cols-3">
           <div>
             <p className="font-mincho text-base tracking-[0.14em] text-kinari">
-              {SHOP.name}
+              {t(SHOP.name, locale)}
             </p>
             <p className="mt-2 text-sm text-usuzumi">
-              {SHOP.address.region}
-              {SHOP.address.locality}
+              {t(SHOP.address.region, locale)}
+              {locale === "en" ? ", " : ""}
+              {t(SHOP.address.locality, locale)}
               <br />
-              {SHOP.address.detail}
+              {t(SHOP.address.detail, locale)}
             </p>
           </div>
 
           <div>
-            <h2 className="text-xs tracking-[0.2em] text-sobacha">営業</h2>
+            <h2 className="text-xs tracking-[0.2em] text-sobacha">
+              {t(COPY.hours, locale)}
+            </h2>
             <ul className="mt-2 space-y-1 text-sm text-usuzumi">
               {SHOP.openingPeriods.map((p) => (
-                <li key={p.label}>
-                  <span className="text-kinari">{formatPeriod(p)}</span>
+                <li key={p.label.ja}>
+                  <span className="text-kinari">
+                    {formatPeriod(p, locale)}
+                  </span>
                   <br />
-                  <span className="text-xs">{p.label}</span>
+                  <span className="text-xs">{t(p.label, locale)}</span>
                 </li>
               ))}
-              <li className="pt-1 text-xs">{SHOP.closedNote}</li>
+              <li className="pt-1 text-xs">{t(SHOP.closedNote, locale)}</li>
             </ul>
           </div>
 
           <div>
-            <h2 className="text-xs tracking-[0.2em] text-sobacha">案内</h2>
+            <h2 className="text-xs tracking-[0.2em] text-sobacha">
+              {t(COPY.guide, locale)}
+            </h2>
             <ul className="mt-2 space-y-1 text-sm">
-              <li>
-                <Link href="/menu" className="text-usuzumi hover:text-andon">
-                  お品書き
-                </Link>
-              </li>
-              <li>
-                <Link href="/access" className="text-usuzumi hover:text-andon">
-                  道のり
-                </Link>
-              </li>
+              {links.map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={localePath(l.href, locale)}
+                    className="text-usuzumi hover:text-andon"
+                  >
+                    {t(l.label, locale)}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -60,8 +84,9 @@ export function Footer() {
           role="note"
           className="rounded border border-hari bg-sumi/60 px-4 py-3 text-xs leading-relaxed text-usuzumi"
         >
-          {SHOP.fictionNotice}
-          {SHOP.contact.note}
+          {t(SHOP.fictionNotice, locale)}
+          {locale === "en" ? " " : ""}
+          {t(SHOP.contact.note, locale)}
         </p>
 
         <p className="mt-6 text-[0.7rem] tracking-wider text-usuzumi/70">
