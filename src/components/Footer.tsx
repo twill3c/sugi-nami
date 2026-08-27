@@ -126,6 +126,8 @@ export function Footer({ locale }: { locale: Locale }) {
             <a href={l.href} target="_blank" rel="noopener">
               {l.label}
             </a>
+            {/* 著作権表示はリンクの外に置く(規約: MIT License © 2026 坂田哲朗 ・ …) */}
+            {i === 0 && " © 2026 坂田哲朗"}
           </span>
         ))}
         <p className="fleet-footer__fiction">{t(SHOP.fictionNotice, locale)}</p>
