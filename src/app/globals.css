@@ -34,7 +34,7 @@ body {
   color: var(--color-kinari);
   font-family: var(--font-gothic);
   /* 下部固定のフリートフッタ(末尾の fleet: fixed footer)に隠れないための逃げ */
-  padding-bottom: 2.6rem;
+  padding-bottom: 4.2rem;
   /*
     和紙のむら。画像を一枚も読み込まずに面の単調さを消すための、
     ごく薄い二重のラジアルグラデーション。
@@ -123,11 +123,24 @@ h3 {
   color: var(--color-usuzumi);
   font-size: 0.72rem;
   letter-spacing: 0.02em;
-  text-align: center;
-  padding: 0.5rem 1rem;
-  white-space: nowrap;
-  overflow-x: auto;
+  padding: 0.45rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.15rem 0.2rem;
 }
-.fleet-footer p { margin: 0; }
 .fleet-footer a { color: var(--color-usuzumi); }
 .fleet-footer a:hover { color: var(--color-andon); }
+/*
+  架空である旨。senoto-mori に倣い、5 項目の**下**に一行として置く。
+  画面幅によらず自分の行を占め、リンクより控えめな濃さにする
+  (規約の並びを読むのが先で、断りはその補足という順序)。
+*/
+.fleet-footer__fiction {
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  font-size: 0.68rem;
+  color: color-mix(in srgb, var(--color-usuzumi) 78%, transparent);
+}

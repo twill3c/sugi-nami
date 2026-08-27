@@ -14,6 +14,21 @@ const COPY = {
   news: { ja: "お知らせ", en: "News" },
 } satisfies Record<string, L10n>;
 
+/** フリート共通規約の 5 項目。並びが規約そのものなので、順序を変えない。 */
+const FLEET_LINKS = [
+  { label: "MIT License", href: "https://github.com/twill3c/sugi-nami/blob/main/LICENSE" },
+  { label: "GitHub", href: "https://github.com/twill3c/sugi-nami" },
+  {
+    label: "杉なみの見て回り方",
+    href: "https://claude.ai/code/artifact/b09c5bd5-4b9a-428d-a3ec-3e408fd85169",
+  },
+  {
+    label: "杉なみ 設計図",
+    href: "https://claude.ai/code/artifact/39e2ebd7-39ba-4412-8277-645b18a5037e",
+  },
+  { label: "App Menu", href: "https://app-menu-amber.vercel.app" },
+] as const;
+
 export function Footer({ locale }: { locale: Locale }) {
   const links = [
     { href: "/menu", label: COPY.menu },
@@ -96,44 +111,24 @@ export function Footer({ locale }: { locale: Locale }) {
       </div>
 
       {/*
-        フリート共通規約のフッタ(MIT / GitHub / 歩き方 / 設計図 / App Menu・下部固定)。
+        フリート共通規約のフッタ(MIT / GitHub / 見て回り方 / 設計図 / App Menu・下部固定)。
         店の案内とは別の層なので、上の footer の中には混ぜず独立した帯として置く。
+
+        ブランドサイト三作(senoto-mori / hoshihata / sugi-nami)は senoto-mori の
+        書きっぷりに揃える —— 規約の 5 項目を先に置き、架空である旨をその下の
+        一行として続ける。断りは装飾ではなく、どのページから入った人にも必ず届かせる。
         逃げの余白は globals.css の body padding-bottom が持つ。
       */}
       <div className="fleet-footer">
-        <p>
-          <a
-            href="https://github.com/twill3c/sugi-nami/blob/main/LICENSE"
-            target="_blank"
-            rel="noopener"
-          >
-            MIT License
-          </a>{" "}
-          © 2026 坂田哲朗 ・{" "}
-          <a href="https://github.com/twill3c/sugi-nami" target="_blank" rel="noopener">
-            GitHub
-          </a>{" "}
-          ・{" "}
-          <a
-            href="https://claude.ai/code/artifact/b09c5bd5-4b9a-428d-a3ec-3e408fd85169"
-            target="_blank"
-            rel="noopener"
-          >
-            杉なみの見て回り方
-          </a>{" "}
-          ・{" "}
-          <a
-            href="https://claude.ai/code/artifact/39e2ebd7-39ba-4412-8277-645b18a5037e"
-            target="_blank"
-            rel="noopener"
-          >
-            杉なみ 設計図
-          </a>{" "}
-          ・{" "}
-          <a href="https://app-menu-amber.vercel.app" target="_blank" rel="noopener">
-            App Menu
-          </a>
-        </p>
+        {FLEET_LINKS.map((l, i) => (
+          <span key={l.href}>
+            {i > 0 && <span aria-hidden="true">・</span>}{" "}
+            <a href={l.href} target="_blank" rel="noopener">
+              {l.label}
+            </a>
+          </span>
+        ))}
+        <p className="fleet-footer__fiction">{t(SHOP.fictionNotice, locale)}</p>
       </div>
     </footer>
   );
