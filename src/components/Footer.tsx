@@ -93,8 +93,46 @@ export function Footer({ locale }: { locale: Locale }) {
           {t(SHOP.contact.note, locale)}
         </p>
 
-        <p className="mt-6 text-[0.7rem] tracking-wider text-usuzumi/70">
-          MIT License © 2026 坂田哲朗
+      </div>
+
+      {/*
+        フリート共通規約のフッタ(MIT / GitHub / 歩き方 / 設計図 / App Menu・下部固定)。
+        店の案内とは別の層なので、上の footer の中には混ぜず独立した帯として置く。
+        逃げの余白は globals.css の body padding-bottom が持つ。
+      */}
+      <div className="fleet-footer">
+        <p>
+          <a
+            href="https://github.com/twill3c/sugi-nami/blob/main/LICENSE"
+            target="_blank"
+            rel="noopener"
+          >
+            MIT License
+          </a>{" "}
+          © 2026 坂田哲朗 ・{" "}
+          <a href="https://github.com/twill3c/sugi-nami" target="_blank" rel="noopener">
+            GitHub
+          </a>{" "}
+          ・{" "}
+          <a
+            href="https://claude.ai/code/artifact/b09c5bd5-4b9a-428d-a3ec-3e408fd85169"
+            target="_blank"
+            rel="noopener"
+          >
+            杉なみの見て回り方
+          </a>{" "}
+          ・{" "}
+          <a
+            href="https://claude.ai/code/artifact/39e2ebd7-39ba-4412-8277-645b18a5037e"
+            target="_blank"
+            rel="noopener"
+          >
+            杉なみ 設計図
+          </a>{" "}
+          ・{" "}
+          <a href="https://app-menu-amber.vercel.app" target="_blank" rel="noopener">
+            App Menu
+          </a>
         </p>
       </div>
     </footer>
