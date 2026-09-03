@@ -111,4 +111,8 @@ MDX (@next/mdx) / Vitest。サーバ関数を持たないので Vercel 上で Fu
 - 明暗は切り替えない。行灯の色に振った一枚の配色に決め打ちしている
 - 大雪による臨時休業はカレンダーに出ない(規則にできないため、注意書きで補っている)
 
-MIT License © 2026 坂田哲朗
+コードは MIT License © 2026 坂田哲朗([LICENSE](LICENSE))。
+
+`src/assets/shippori-latin.woff` は **Shippori Mincho B1 の欧文部分集合**で、
+**SIL Open Font License 1.1**(全文は [src/assets/OFL.txt](src/assets/OFL.txt)、
+経緯は [NOTICE](NOTICE))。
